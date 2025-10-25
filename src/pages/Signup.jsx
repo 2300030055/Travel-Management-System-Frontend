@@ -10,15 +10,17 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-  const res = await api.post("/auth/signup", form);
-  alert(res.data);
+      const res = await api.post("/auth/signup", {
+        username: form.username,
+        email: form.email,
+        password: form.password
+      });
+      alert(res.data); // Show success message from backend
       navigate("/");
-    } catch {
-      alert("Registration failed. Username or email may already exist.");
+    } catch (error) {
+      alert(error.response?.data || "Registration failed. Username or email may already exist.");
     }
-  };
-
-  return (
+  };  return (
     <div className="auth-container car-theme">
       <div className="auth-box">
         <h2>Create Your Account</h2>
