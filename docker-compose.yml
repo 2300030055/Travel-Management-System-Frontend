@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    container_name: tms_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "@Indianarmy7"
+      MYSQL_DATABASE: carrental
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./Backend/carrental-backend-main
+      dockerfile: Dockerfile
+    container_name: tms_backend
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/carrental
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: "@Indianarmy7"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # the frontend will be built with the backend URL baked in
+        VITE_API_BASE: http://backend:8081
+    container_name: tms_frontend
+    restart: unless-stopped
+    ports:
+      # map host 5173 to container 80 so you can still open :5173 in dev workflow
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
